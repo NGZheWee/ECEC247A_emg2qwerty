@@ -1,0 +1,86 @@
+Final Project
+
+tmux kill-server
+
+tmux new -s grid1000hz
+ctrlB+D
+
+conda activate emg2qwerty
+cd ~/ECEC247A_emg2qwerty
+
+python run_grid_1000hz_stability.py| tee run_grid_1000hz_stability.log
+
+python run.py| tee run.log
+
+
+cd "ECEC247A_emg2qwerty"
+
+conda activate emg2qwerty
+
+python -m emg2qwerty.train user="single_user" trainer.accelerator=gpu trainer.devices=1
+
+python -m emg2qwerty.train \
+  user="single_user" \
+  trainer.accelerator=gpu \
+  trainer.devices=1 \
+  trainer.max_epochs=45 \
+  module._target_=emg2qwerty.lightning.TDSConvLSTMCTCModule \
+  module.in_features=528 \
+  'module.mlp_features=[384]' \
+  'module.block_channels=[24,24,24,24]' \
+  module.kernel_width=32 \
+  +module.lstm_hidden_size=256 \
+  +module.lstm_num_layers=2 \
+  +module.lstm_dropout=0.2 \
+  +module.bidirectional=false
+
+python -m emg2qwerty.train \
+  user="single_user" \
+  trainer.accelerator=gpu \
+  trainer.devices=1 \
+  trainer.max_epochs=45 \
+  module._target_=emg2qwerty.lightning.TDSConvLSTMCTCModule \
+  module.in_features=528 \
+  'module.mlp_features=[384]' \
+  'module.block_channels=[24,24,24,24]' \
+  module.kernel_width=32 \
+  +module.lstm_hidden_size=256 \
+  +module.lstm_num_layers=2 \
+  +module.lstm_dropout=0.2 \
+  +module.bidirectional=true
+
+python -m emg2qwerty.train \
+  user="single_user" \
+  trainer.accelerator=gpu \
+  trainer.devices=1 \
+  trainer.max_epochs=45 \
+  module._target_=emg2qwerty.lightning.TDSConvGRUCTCModule \
+  module.in_features=528 \
+  'module.mlp_features=[384]' \
+  'module.block_channels=[24,24,24,24]' \
+  module.kernel_width=32 \
+  +module.gru_hidden_size=256 \
+  +module.gru_num_layers=2 \
+  +module.gru_dropout=0.2 \
+  +module.bidirectional=false
+
+python -m emg2qwerty.train \
+  user="single_user" \
+  trainer.accelerator=gpu \
+  trainer.devices=1 \
+  trainer.max_epochs=45 \
+  module._target_=emg2qwerty.lightning.TDSConvGRUCTCModule \
+  module.in_features=528 \
+  'module.mlp_features=[384]' \
+  'module.block_channels=[24,24,24,24]' \
+  module.kernel_width=32 \
+  +module.gru_hidden_size=256 \
+  +module.gru_num_layers=2 \
+  +module.gru_dropout=0.2 \
+  +module.bidirectional=true
+
+
+git config --global user.name "NGZheWee"
+git config --global user.email "ngzhewee@hotmail.com"
+
+gcloud compute ssh --zone "us-central1-a" "nndl" --project "ecec247aproject"
